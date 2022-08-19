@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Number</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      ul {
+        list-style-type: none;
+      }
+      li {
+        float: left;
+      }
+      ul > li > div.number {
+        height: 5rem;
+        width: 5rem;
+        border-style: dashed;
+        border-width: 2px;
+        margin: 10px;
+        padding: 5px;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        -webkit-box-align: center;
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 5rem;
+      }
+
+      ul > li > div.indicator {
+        height: 5rem;
+        width: 5rem;
+        border-style: none;
+        border-width: 2px;
+        margin: 10px;
+        padding: 5px;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        -webkit-box-align: center;
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 5rem;
+      }
+
+      .focussed-element {
+        border-style: solid !important;
+        border-color: darkslateblue;
+        background-color: cadetblue;
+        color: white;
+      }
+
+      .after-element {
+        border-style: solid !important;
+        border-color: lightgreen;
+        background-color: green;
+        color: white;
+      }
+
+      .before-element {
+        border-style: solid !important;
+        border-color: orangered;
+        background-color: coral;
+        color: white;
+      }
+
+      .focussed-li {
+        border: black;
+        border-width: 2px;
+        border-style: solid;
+      }
+
+      .before-text {
+        color: coral;
+      }
+
+      .after-text {
+        color: green;
+      }
+
+      .number-text {
+        color: cadetblue;
+      }
+
+      .header {
+        margin-bottom: 5rem;
+      }
+      .header-text {
+        font-size: 100px;
+      }
+
+      .indicator-correct-answer {
+        color: green;
+      }
+
+      .indicator-wrong-answer {
+        color: darkred;
+      }
+
+      .clear {
+        float: none;
+      }
+      .toolbar {
+        margin-top: 10px;
+      }
+      .play-again {
+        color: white;
+        border-radius: 4px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        background: rgb(66, 184, 221);
+        font-size: 200%;
+        width: 20rem;
+        height: 5rem;
+        border-style: none;
+      }
+      .play-again-show {
+        display: block;
+      }
+      .play-again-hide {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-text">
+        What number is <span id="before-after-text"></span>
+        <span id="number-text"></span>
+      </div>
+    </div>
+    <div class="main">
+      <ul>
+        <li tabindex="1">
+          <div class="number">1</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">2</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">3</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">4</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">5</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">6</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">7</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">8</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">9</div>
+          <div class="indicator"></div>
+        </li>
+        <li tabindex="1">
+          <div class="number">10</div>
+          <div class="indicator"></div>
+        </li>
+      </ul>
+      <div class="clear"></div>
+    </div>
+    <div class="clear"></div>
+    <div class="toolbar">
+      <button
+        id="play-button"
+        class="play-again, play-again-hide"
+        onclick="playAgain();"
+      >
+        &#8635; Play again
+      </button>
+    </div>
+
+    <script type="text/javascript">
+      const resetState = 0;
+      const focusState = 1;
+
+      let focussedBlock = null;
+      let beforeBlock = null;
+      let afterBlock = null;
+      let correctAnswerBlock = null;
+
+      let gameState = resetState;
+      let wrong_count = 0;
+      let max_wrong_count = 0;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        load();
+      });
+
+      function load() {
+        hookNumberBlocksToEvents();
+        kickoff();
+      }
+
+      function hookNumberBlocksToEvents() {
+        const liElements = document.getElementsByTagName("li");
+        max_wrong_count = liElements.length - 1;
+        for (let li of liElements) {
+          li.addEventListener("focus", (evt) => {
+            const targetElement = evt.target;
+            const numberElements =
+              targetElement.getElementsByClassName("number");
+            if (numberElements[0] == focussedBlock) return;
+            const indicators =
+              targetElement.getElementsByClassName("indicator");
+            if (gameState == focusState) {
+              if (checkAnswer(targetElement)) {
+                indicators[0].innerHTML = `&#10003;`;
+                indicators[0].classList.add("indicator-correct-answer");
+                speak("That's correct")
+                showPlayButton();
+              } else {
+                indicators[0].innerHTML = `&#10008;`;
+                indicators[0].classList.add("indicator-wrong-answer");
+                speak("That's not right. Try again");
+                wrong_count += 1;
+                if (wrong_count == max_wrong_count) {                    
+                  showPlayButton();
+                }
+              }
+              return;
+            }
+
+            const beforeElement = targetElement.previousSibling.previousSibling;
+            const afterElement = targetElement.nextSibling.nextSibling;
+            if (beforeElement != null) {
+              const innerDivs = beforeElement.getElementsByTagName("div");
+              innerDivs[0].classList.add("before-element");
+              beforeBlock = innerDivs[0];
+            }
+            if (afterElement != null) {
+              const innerDivs = afterElement.getElementsByTagName("div");
+              innerDivs[0].classList.add("after-element");
+              afterBlock = innerDivs[0];
+            }
+            const innerDivs = targetElement.getElementsByTagName("div");
+            targetElement.classList.add("focussed-li");
+            innerDivs[0].classList.add("focussed-element");
+            focussedBlock = innerDivs[0];
+            let isBefore = getRandomBeforeOrAfter() == -1;
+            if (
+              (numberElements[0].innerText == max_wrong_count+1 && !isBefore) ||
+              (numberElements[0].innerText == 1 && isBefore)
+            ) {
+              isBefore = !isBefore;
+            }
+            const number = innerDivs[0].innerText;
+            correctAnswerBlock = isBefore ? beforeBlock : afterBlock;
+            const speechText = `What number comes ${isBefore ? "before" : "after"} ${number}`;
+            speak(speechText);
+            const beforeAfterTextElement =
+              document.getElementById("before-after-text");
+            const numberTextElement = document.getElementById("number-text");
+            beforeAfterTextElement.innerText = `${
+              isBefore ? "before" : "after"
+            }`;
+            if(isBefore) {
+                beforeAfterTextElement.classList.remove("after-text");
+                beforeAfterTextElement.classList.add("before-text");
+            }
+            else
+            {
+                beforeAfterTextElement.classList.add("after-text");
+                beforeAfterTextElement.classList.remove("before-text");
+            }
+            beforeAfterTextElement.classList.add(
+              `${isBefore ? "before-text" : "after-text"}`
+            );
+            numberTextElement.innerText = ` ${number}`;
+            numberTextElement.classList.add("number-text");
+
+            gameState = focusState;
+          });
+        }
+      }
+
+      function showPlayButton() {
+        const play_button = document.getElementById("play-button");
+        play_button.classList.remove("play-again-hide");
+        play_button.classList.add("play-again", "play-again-show");
+      }
+
+      function hidePlayButton() {
+        const play_button = document.getElementById("play-button");
+        play_button.classList.add("play-again-hide");
+        play_button.classList.remove("play-again", "play-again-show");
+      }
+
+      function kickoff() {
+        next();
+      }
+
+      function next() {
+        reset();
+        randomnumber = getRandomBlockNumber();
+        const allBlocks = document.querySelectorAll("ul > li");
+        allBlocks[randomnumber - 1].focus();
+      }
+
+      function reset() {
+        if (gameState == resetState) return;
+
+        for (const li of document.getElementsByClassName("focussed-li")) {
+          li.classList.remove("focussed-li");
+        }
+
+        if (focussedBlock) focussedBlock.classList.remove("focussed-element");
+        if (beforeBlock) beforeBlock.classList.remove("before-element");
+        if (afterBlock) afterBlock.classList.remove("after-element");
+
+        focussedBlock = null;
+        beforeBlock = null;
+        afterBlock = null;
+        correctAnswerBlock = null;
+        wrong_count = 0;
+        const indicators = document.getElementsByClassName("indicator");
+        for (const indicator of indicators) {
+          indicator.innerHTML = "";
+          indicator.classList.remove(
+            "indicator-correct-answer",
+            "indicator-wrong-answer"
+          );
+        }
+        hidePlayButton();
+        gameState = resetState;
+      }
+
+      function playAgain() {     
+        //speak("Play again");          
+        next();        
+      }
+
+      function checkAnswer(targetElement) {
+        const innerDivs = targetElement.getElementsByTagName("div");
+        const targetBlock = innerDivs[0];
+
+        if (targetBlock == correctAnswerBlock) {
+          return true;
+        }
+        return false;
+      }
+
+      function getRandomBeforeOrAfter() {
+        const beforeOrAfter = getRandomIntInclusive(0, 1);
+        return beforeOrAfter == 0 ? -1 : 1;
+      }
+
+      function getRandomBlockNumber() {
+        return getRandomIntInclusive(1, 10);
+      }
+
+      function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+      }
+      function speak(speechText) {
+        let speaknow = new SpeechSynthesisUtterance(speechText); 
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(speaknow);   
+      }
+    </script>
+  </body>
+</html>

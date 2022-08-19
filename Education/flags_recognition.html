@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+    <title>Flag Recognition</title>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        flex: 1 200px;
+        align-items: center;
+        justify-content: space-around;
+        background-color: black;
+        padding-bottom: 30px;
+      }
+      .flag {
+        margin-top: 40px;
+        display: none;
+      }
+      .flag-image {
+        height: 400px;
+      }
+      .flag-name {
+        font-size: xx-large;
+        text-align: center;
+        text-transform: uppercase;
+        color: white;
+        margin-top: 20px;
+      }
+      .toolbar {
+        margin-top: 40px;
+      }
+      .toolbar > button {
+        padding: 30px;
+        padding-left: 45px;
+        padding-right: 45px;
+        border-radius: 5px;
+        border-width: thin;
+        font-weight: bold;
+        font-size: larger;
+      }
+      .back {
+        margin-left: 38%;
+      }
+      .next {
+        margin-left: 20px;
+      }
+      #play-button {
+        padding: unset;
+        padding-left: unset;
+        padding-right: unset;
+        border-radius: unset;
+        border-width: unset;
+        font-weight: unset;
+        font-size: unset;
+
+        border-radius: 100px;
+        height: 75px;
+        width: 75px;
+        font-size: xx-large;
+        margin-bottom: 5px;
+        /* float: right; */
+        /* margin-right: 20px; */
+      }
+      .play-button-container {
+        float: right;
+        margin-right: 20px;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      /* Rounded sliders */
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+      .slider-container {
+        text-align: right;
+        margin-top: 60%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container" class="container">
+      <!-- <div id="au" class="flag" data-name="Australia" tabindex="1">
+        <img class="flag-image" src="/flags/au.svg" />
+        <div class="flag-name">Australia</div>
+      </div>
+      <div id="sg" class="flag" data-name="Singapore" tabindex="1">
+        <img class="flag-image" src="/flags/sg.svg" />
+        <div class="flag-name">Singapore</div>
+      </div>
+      <div id="in" class="flag" data-name="India" tabindex="1">
+        <img class="flag-image" src="/flags/in.svg" />
+        <div class="flag-name">India</div>
+      </div> -->
+    </div>
+
+    <div class="toolbar">
+      <button id="back-button" class="back" onclick="back()">
+        &#8592; BACK
+      </button>
+      <button id="next-button" class="next" onclick="next()">
+        NEXT &#8594;
+      </button>
+
+      <div class="play-button-container">
+        <button id="play-button" class="play" onclick="speakFlagName();">
+          &#128362;
+        </button>
+        <div class="slider-container">
+          <label class="switch">
+            <input id="auto-speak-switch" type="checkbox" onchange="onAutoSpeakChange();" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      let autoSpeakEnabled = true;
+      let slidePosition = 1;
+      let selectedSlide = null;
+
+      flags = [
+        { name: "Australia", code: "au" },
+        { name: "India", code: "in" },
+        { name: "Singapore", code: "sg" },
+        { name: "United States of America", code: "us" },
+        { name: "China", code: "cn" },
+        { name: "England", code: "gb-eng" },
+        { name: "New Zealand", code: "nz" },
+        { name: "Germany", code: "de" },
+        { name: "South Africa", code: "za" },
+        { name: "Canada", code: "ca" },
+        { name: "Japan", code: "jp" },
+        { name: "Bangladesh", code: "bd" },
+        { name: "Nepal", code: "np" },
+        { name: "Pakistan", code: "pk" },
+        { name: "South Korea", code: "kr" },
+        { name: "Thailand", code: "th" },
+        { name: "Malaysia", code: "my" },
+        { name: "Indonesia", code: "id" },
+        { name: "Russia", code: "ru" },
+        { name: "France", code: "fr" },
+        { name: "Switzerland", code: "ch" },
+        { name: "Italy", code: "it" },
+        { name: "Greece", code: "gr" },
+        { name: "Argentina", code: "ar" },
+        { name: "Brazil", code: "br" },
+        { name: "Spain", code: "es" },
+      ];
+
+      document.addEventListener("DOMContentLoaded", (evt) => {
+        kickoff();
+      });
+
+      function kickoff() {
+        createFlags();
+        const auto_speak_switch = document.getElementById("auto-speak-switch");
+        if(autoSpeakEnabled) {
+          auto_speak_switch.checked = true;
+        }
+        slideShow(slidePosition);
+      }
+
+      function createFlags() {
+        const containerElement = document.getElementById("container");
+        for (const flag of flags) {
+          let flagDiv = document.createElement("div");
+          flagDiv.setAttribute("id", `${flag.code}`);
+          flagDiv.setAttribute("tabindex", 1);
+          flagDiv.setAttribute("data-name", flag.name);
+          flagDiv.classList.add("flag");
+
+          let imgDiv = document.createElement("img");
+          imgDiv.setAttribute("src", `/flags/${flag.code}.svg`);
+          imgDiv.classList.add("flag-image");
+          flagDiv.appendChild(imgDiv);
+
+          let nameDiv = document.createElement("div");
+          nameDiv.innerText = flag.name;
+          nameDiv.classList.add("flag-name");
+          flagDiv.appendChild(nameDiv);
+
+          // flagDiv.addEventListener("click", (evt) => {
+          //   const selectedFlagDiv = evt.currentTarget;
+          //   const flag_name = selectedFlagDiv.dataset.name;
+          //   speak(flag_name);
+          // });
+
+          containerElement.appendChild(flagDiv);
+        }
+      }
+
+      function next() {
+        plusSlides(1);
+
+        selectedSlide.classList.remove("w3-animate-left");
+        selectedSlide.classList.add("w3-animate-right");
+      }
+
+      function back() {
+        plusSlides(-1);
+
+        selectedSlide.classList.add("w3-animate-left");
+        selectedSlide.classList.remove("w3-animate-right");
+      }
+
+      // forward/Back controls
+      function plusSlides(n) {
+        slideShow((slidePosition += n));
+      }
+
+      //  images controls
+      // function currentSlide(n) {
+      //   slideShow((slidePosition = n));
+      // }
+
+      function slideShow(n) {
+        var i;
+        var slides = document.getElementsByClassName("flag");
+        
+        if (n > slides.length) {
+          slidePosition = 1;
+        }
+        if (n < 1) {
+          slidePosition = slides.length;
+        }
+        for (i = 0; i < slides.length; i++) {
+          slides[i].style.display = "none";
+        }
+        
+        selectedSlide = slides[slidePosition - 1];
+
+        selectedSlide.style.display = "block";
+        if(autoSpeakEnabled) {
+          speakFlagName();
+        }        
+      }
+
+
+      function onAutoSpeakChange() {
+        const auto_speak_switch = document.getElementById("auto-speak-switch");
+        if(auto_speak_switch.checked) {
+          autoSpeakEnabled = true;
+        }
+        else {
+          autoSpeakEnabled = false;
+        }
+      }
+
+      function speakFlagName() {
+        const flag_name = selectedSlide.dataset.name;
+        speak(flag_name);
+      }
+
+      function speak(speechText) {
+        let speaknow = new SpeechSynthesisUtterance(speechText);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(speaknow);
+      }
+    </script>
+  </body>
+</html>

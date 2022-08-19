@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flags</title>
+
+    <style>
+      .container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        flex: 1 200px;
+        align-items: center;
+        justify-content: space-around;
+        background-color: black;
+      }
+      .flag {
+        margin: 20px;
+      }
+      .flag-image {
+        height: 100px;
+      }
+      .flag-name {
+        font-size: x-large;
+        text-align: center;
+        text-transform: uppercase;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Australia, India, Singapore, USA, England, Pakistan, Bangladesh, Germany, Nepal,  -->
+    <div id="container" class="container">
+      <!-- <div id="au" class="flag" data-name="Australia" tabindex="1">
+        <img class="flag-image" src="/flags/au.svg" />
+        <div class="flag-name">Australia</div>
+      </div>
+      <div id="au" class="flag" data-name="Australia" tabindex="1">
+        <img class="flag-image" src="/flags/au.svg" />
+        <div class="flag-name">Australia</div>
+      </div>
+      <div id="au" class="flag" data-name="Australia" tabindex="1">
+        <img class="flag-image" src="/flags/au.svg" />
+        <div class="flag-name">Australia</div>
+      </div> -->
+    </div>
+
+    <script type="text/javascript">
+      flags = [
+        { name: "Australia", code: "au" },
+        { name: "India", code: "in" },
+        { name: "Singapore", code: "sg" },
+        { name: "United States of America", code: "us" },
+        { name: "China", code: "cn" },
+        { name: "England", code: "gb-eng" },
+        { name: "New Zealand", code: "nz" },
+        { name: "Germany", code: "de" },
+        { name: "South Africa", code: "za" },
+        { name: "Canada", code: "ca" },
+        { name: "Japan", code: "jp" },
+        { name: "Bangladesh", code: "bd" },
+        { name: "Nepal", code: "np" },
+        { name: "Pakistan", code: "pk" },
+        { name: "South Korea", code: "kr" },
+        { name: "Thailand", code: "th" },
+        { name: "Malaysia", code: "my" },
+        { name: "Indonesia", code: "id" },
+        { name: "Russia", code: "ru" },
+        { name: "France", code: "fr" },
+        { name: "Switzerland", code: "ch" },
+        { name: "Italy", code: "it" },
+        { name: "Greece", code: "gr" },
+        { name: "Argentina", code: "ar" },
+        { name: "Brazil", code: "br" },
+        { name: "Spain", code: "es" },
+        
+      ];
+      const containerElement = document.getElementById("container");
+      for (const flag of flags) {
+          let flagDiv = document.createElement("div");
+          flagDiv.setAttribute("id", `${flag.code}`);
+          flagDiv.setAttribute("tabindex", 1);
+          flagDiv.setAttribute("data-name", flag.name);
+          flagDiv.classList.add("flag");
+
+          let imgDiv = document.createElement("img"); 
+          imgDiv.setAttribute("src", `/flags/${flag.code}.svg`);
+          imgDiv.classList.add("flag-image");
+          flagDiv.appendChild(imgDiv);
+
+          let nameDiv = document.createElement("div");
+          nameDiv.innerText = flag.name;
+          nameDiv.classList.add("flag-name");
+          flagDiv.appendChild(nameDiv);
+
+          flagDiv.addEventListener("click", (evt) => {
+            const selectedFlagDiv = evt.currentTarget;
+            const flag_name = selectedFlagDiv.dataset.name;
+            speak(flag_name);
+          });
+
+          containerElement.appendChild(flagDiv);
+
+      }
+    //   const flagDivs = document.getElementsByClassName("flag");
+    //   for (const flagDiv of flagDivs) {
+    //     flagDiv.addEventListener("focus", (evt) => {
+    //       const selectedFlagDiv = evt.target;
+    //       const flag_name = selectedFlagDiv.dataset.name;
+    //       speak(flag_name);
+    //     });
+    //   }
+
+      function speak(speechText) {
+        let speaknow = new SpeechSynthesisUtterance(speechText);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(speaknow);
+      }
+    </script>
+  </body>
+</html>
